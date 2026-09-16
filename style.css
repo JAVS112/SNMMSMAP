@@ -12,11 +12,15 @@ body {
 .Border {
   position: absolute;
   top: 0;
-  left: px;
+  left: 0;
+
   width: 1500px;
   height: 100%;
+
   pointer-events: none;
+
   transform: rotate(-90deg);
+  transform-origin: center;
 }
 /* Logo and title header styling */
 .image-row {
@@ -48,6 +52,7 @@ body {
   height: 100px;
 }
 /* Map container (sudlanan) */
+/* BASE RULE — desktop size, unchanged from your original */
 #map-container {
   width: 100%;
   max-width: 1220px;
@@ -56,20 +61,21 @@ body {
   border: 1px solid #e2e8f0;
   background: #fff;
   box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
 }
-.map-scale-wrapper {
-  width: 1200px;
-  height: 1200px;
-}
-/* Map area (mga buildings)*/
+
+/* =========================================
+   MAP AREA
+========================================= */
 
 .map-area {
-  position: relative;
+  position: absolute;
+
   width: 1200px;
   height: 1200px;
+
+  top: 0;
+  left: 0;
 }
 
 .NewB {
@@ -382,7 +388,17 @@ body {
   -webkit-user-drag: none;
 }
 /* auto-adjust map scaling for different screen sizes */
+/* MOBILE-ONLY RULE — this is where the scroll fix belongs */
 @media screen and (max-width: 600px) {
+  #map-container {
+    width: 95vw;
+    height: 70vh;
+    overflow: auto;
+    display: block;
+    padding: 0;
+    position: relative;
+    touch-action: pan-x pan-y;
+  }
   body {
     padding-top: 15px;
   }
@@ -401,14 +417,6 @@ body {
     width: 50px;
     height: 50px;
   }
-  #map-container {
-    width: 95vw;
-    height:70vh;
-    overflow: hidden;
-    display: block;
-    padding: 0;
-    position: relative;
-    touch-action: none;
   }
   .modal-content {
     width: 95%;
@@ -419,4 +427,3 @@ body {
     font-size: 13px;
     flex: 1 1 40%;
   }
-}

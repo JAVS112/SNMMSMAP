@@ -1,370 +1,94 @@
+// =========================================
+// SNMMS DIGITAL SCHOOL MAP - script.js
+// =========================================
+// IMPORTANT: In your index.html, make sure the <script> tag has "defer" on it,
+// and it can stay in <head> or before <body> - defer makes it wait until
+// the HTML page has finished loading before running this file. Example:
+//
+//   <script src="script.js" defer></script>
+//
+// Without "defer", this file tries to grab #map-container and #map before
+// they exist yet, and everything below silently fails.
+
+
+// -----------------------------------------
+// 1. GRAB THE MAP ELEMENTS FROM THE PAGE
+// -----------------------------------------
+const mapContainer = document.getElementById("map-container");
+const mapArea = document.getElementById("map");
+
+// This is the "real" size of your map artwork (the .map-area box in your CSS
+// is 1200px by 1200px). We use these numbers to figure out how much to shrink
+// the map so it fits inside the visible window, no matter the screen size.
+const MAP_WIDTH = 1200;
+const MAP_HEIGHT = 1200;
+
+
+// -----------------------------------------
+// 2. STOP IMAGES FROM BEING DRAGGED
+// -----------------------------------------
+// This just prevents the "ghost image" drag effect when someone clicks
+// and drags on a map image.
 document.querySelectorAll("#map img").forEach((img) => {
   img.addEventListener("dragstart", function (e) {
     e.preventDefault();
   });
 });
 
+
+// -----------------------------------------
+// 3. SCALE THE MAP TO FIT ITS CONTAINER
+// -----------------------------------------
+// This is the function that fixes the "zoomed in" problem.
+// It measures how big the container is right now (which changes based on
+// your CSS media query for phones vs desktop), then shrinks the map down
+// so the WHOLE 1200x1200 map fits inside, instead of getting cropped.
 function adjustMapScale() {
-  const container = document.getElementById("map-container");
-  const mapArea = document.getElementById("map");
+  if (!mapContainer || !mapArea) return;
 
-  if (!container || !mapArea) return;
+  const isMobile = window.innerWidth <= 600;
 
-  const isPhone = window.innerWidth <= 600;
-
-  // ==============================
-  // MOBILE
-  // ==============================
-  if (isPhone) {
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-
-    // Fit the 1200x1200 map inside the phone screen
-    const scaleWidth = containerWidth / 1200;
-    const scaleHeight = containerHeight / 1200;
-
-    const initialScale = Math.min(scaleWidth, scaleHeight);
-
-    mapScale = initialScale;
-    mapX = 0;
-    mapY = 0;
-    mapRotation = 0;
-
-    mapArea.style.transformOrigin = "center center";
-
-    updateMapTransform();
-
+  // MOBILE: show the map at its real, full size (no shrinking).
+  // The container will scroll/swipe naturally instead.
+  if (isMobile) {
+    mapArea.style.transform = "none";
+    mapArea.style.left = "0px";
+    mapArea.style.top = "0px";
     return;
   }
 
-  // ==============================
-  // DESKTOP / TABLET
-  // ==============================
+  // DESKTOP: shrink the map down so the WHOLE thing fits in the box,
+  // then center it.
+  const scaleX = mapContainer.clientWidth / MAP_WIDTH;
+  const scaleY = mapContainer.clientHeight / MAP_HEIGHT;
+  const scale = Math.min(scaleX, scaleY);
 
-  mapArea.style.transformOrigin = "center center";
+  const scaledWidth = MAP_WIDTH * scale;
+  const scaledHeight = MAP_HEIGHT * scale;
 
-  const containerWidth = container.clientWidth - 20;
-  const containerHeight = container.clientHeight - 20;
+  const offsetX = (mapContainer.clientWidth - scaledWidth) / 2;
+  const offsetY = (mapContainer.clientHeight - scaledHeight) / 2;
 
-  const scaleWidth = containerWidth / 1200;
-  const scaleHeight = containerHeight / 1200;
-
-  const scale = Math.min(scaleWidth, scaleHeight, 1);
-
-  mapArea.style.transform =
-    `scale(${scale})`;
+  mapArea.style.transform = `scale(${scale})`;
+  mapArea.style.transformOrigin = "top left";
+  mapArea.style.left = `${offsetX}px`;
+  mapArea.style.top = `${offsetY}px`;
 }
 
-
-// =========================================
-// MOBILE MAP CONTROLS
-// =========================================
-
-const mapContainer = document.getElementById("map-container");
-const mapArea = document.getElementById("map");
-
-let mapX = 0;
-let mapY = 0;
-
-let mapScale = 1;
-let mapRotation = 0;
-
-
-// Starting position for one finger
-let startX = 0;
-let startY = 0;
-
-let startMapX = 0;
-let startMapY = 0;
-
-
-// Starting values for two fingers
-let startDistance = 0;
-let startAngle = 0;
-
-let startCenterX = 0;
-let startCenterY = 0;
-
-let startScale = 1;
-let startRotation = 0;
-
-
-// =========================================
-// UPDATE MAP
-// =========================================
-
-function updateMapTransform() {
-  mapArea.style.transform =
-    `translate(${mapX}px, ${mapY}px) ` +
-    `scale(${mapScale}) ` +
-    `rotate(${mapRotation}deg)`;
-}
-
-
-// =========================================
-// DISTANCE BETWEEN TWO FINGERS
-// =========================================
-
-function getDistance(touch1, touch2) {
-  const dx = touch2.clientX - touch1.clientX;
-  const dy = touch2.clientY - touch1.clientY;
-
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-
-// =========================================
-// ANGLE BETWEEN TWO FINGERS
-// =========================================
-
-function getAngle(touch1, touch2) {
-  const dx = touch2.clientX - touch1.clientX;
-  const dy = touch2.clientY - touch1.clientY;
-
-  return Math.atan2(dy, dx) * (180 / Math.PI);
-}
-
-
-// =========================================
-// TOUCH START
-// =========================================
-
-mapContainer.addEventListener(
-  "touchstart",
-  function (e) {
-
-    if (window.innerWidth > 600) return;
-
-    // ==========================
-    // ONE FINGER
-    // ==========================
-
-    if (e.touches.length === 1) {
-
-      const touch = e.touches[0];
-
-      startX = touch.clientX;
-      startY = touch.clientY;
-
-      startMapX = mapX;
-      startMapY = mapY;
-    }
-
-
-    // ==========================
-    // TWO FINGERS
-    // ==========================
-
-    if (e.touches.length === 2) {
-
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-
-      startDistance =
-        getDistance(touch1, touch2);
-
-      startAngle =
-        getAngle(touch1, touch2);
-
-
-      // Save the CENTER between fingers
-      startCenterX =
-        (touch1.clientX + touch2.clientX) / 2;
-
-      startCenterY =
-        (touch1.clientY + touch2.clientY) / 2;
-
-
-      startMapX = mapX;
-      startMapY = mapY;
-
-      startScale = mapScale;
-      startRotation = mapRotation;
-    }
-
-  },
-  { passive: false }
-);
-
-
-// =========================================
-// TOUCH MOVE
-// =========================================
-
-mapContainer.addEventListener(
-  "touchmove",
-  function (e) {
-
-    if (window.innerWidth > 600) return;
-
-    e.preventDefault();
-
-
-    // ==========================
-    // ONE FINGER = PAN
-    // ==========================
-
-    if (e.touches.length === 1) {
-
-      const touch = e.touches[0];
-
-      const dx =
-        touch.clientX - startX;
-
-      const dy =
-        touch.clientY - startY;
-
-
-      mapX =
-        startMapX + dx;
-
-      mapY =
-        startMapY + dy;
-
-
-      updateMapTransform();
-    }
-
-
-    // ==========================
-    // TWO FINGERS
-    // ==========================
-
-    if (e.touches.length === 2) {
-
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-
-
-      // --------------------------
-      // CURRENT DISTANCE
-      // --------------------------
-
-      const currentDistance =
-        getDistance(touch1, touch2);
-
-
-      // --------------------------
-      // CURRENT ANGLE
-      // --------------------------
-
-      const currentAngle =
-        getAngle(touch1, touch2);
-
-
-      // --------------------------
-      // ZOOM
-      // --------------------------
-
-      if (startDistance > 0) {
-
-        const scaleChange =
-          currentDistance / startDistance;
-
-        mapScale =
-          startScale * scaleChange;
-      }
-
-
-      // Limit zoom
-      mapScale =
-        Math.max(0.5, Math.min(mapScale, 3));
-
-
-      // --------------------------
-      // ROTATION
-      // --------------------------
-
-      const angleChange =
-        currentAngle - startAngle;
-
-      mapRotation =
-        startRotation + angleChange;
-
-
-      // --------------------------
-      // MOVE USING FINGER CENTER
-      // --------------------------
-
-      const currentCenterX =
-        (touch1.clientX + touch2.clientX) / 2;
-
-      const currentCenterY =
-        (touch1.clientY + touch2.clientY) / 2;
-
-
-      mapX =
-        startMapX +
-        (currentCenterX - startCenterX);
-
-      mapY =
-        startMapY +
-        (currentCenterY - startCenterY);
-
-
-      updateMapTransform();
-    }
-
-  },
-  { passive: false }
-);
-
-
-// =========================================
-// TOUCH END
-// =========================================
-
-mapContainer.addEventListener(
-  "touchend",
-  function () {
-
-    if (window.innerWidth > 600) return;
-
-    startMapX = mapX;
-    startMapY = mapY;
-
-    startScale = mapScale;
-    startRotation = mapRotation;
-
-  },
-  { passive: false }
-);
-
-
-// =========================================
-// INITIALIZE MAP
-// =========================================
-
-window.addEventListener(
-  "load",
-  adjustMapScale
-);
-
-
-window.addEventListener(
-  "resize",
-  function () {
-
-    setTimeout(
-      adjustMapScale,
-      200
-    );
-
-  }
-);
-
-
-window.addEventListener(
-  "orientationchange",
-  function () {
-
-    setTimeout(
-      adjustMapScale,
-      500
-    );
-
-  }
-);
+// Run it once as soon as everything on the page has loaded...
+window.addEventListener("load", adjustMapScale);
+
+// ...and run it again every time the window is resized (rotating a phone,
+// resizing a browser window, etc.) so the map keeps fitting correctly.
+window.addEventListener("resize", adjustMapScale);
+
+
+// -----------------------------------------
+// 4. BUILDING / FLOOR / ROOM DATA
+// -----------------------------------------
+// This is just a big object holding info about every clickable building.
+// Buildings with "floors" show a floor picker inside the popup.
+// Buildings with just "img" show a single image with no floor picker.
 const buildingData = {
   newBuilding: {
     name: "New Building",
@@ -392,7 +116,6 @@ const buildingData = {
           },
         ],
       },
-
       {
         name: "Second Floor",
         img: "FINAL/buildingA-f2.png",
@@ -460,8 +183,14 @@ const buildingData = {
   },
 };
 
+// Keeps track of which building's popup is currently open,
+// so other functions (like selectFloorLevel) know which one to work with.
 let activeBuildingKey = "";
 
+
+// -----------------------------------------
+// 5. OPEN THE BUILDING POPUP (MODAL)
+// -----------------------------------------
 function openFloorPlan(buildingKey) {
   const building = buildingData[buildingKey];
 
@@ -477,26 +206,24 @@ function openFloorPlan(buildingKey) {
   const blueprint = document.getElementById("floor-blueprint");
   const buttonContainer = document.getElementById("floor-buttons-container");
 
-  // Set building name
+  // Set the building's name at the top of the popup
   buildingName.textContent = building.name;
 
-  // Clear old content
+  // Clear any old floor buttons from the last time a popup was opened
   buttonContainer.innerHTML = "";
 
-  // SINGLE IMAGE
+  // CASE 1: Building has a single image (no floor picker needed)
   if (building.img) {
     blueprint.src = building.img;
-
     buttonContainer.style.display = "none";
   }
 
-  // MULTIPLE FLOORS
+  // CASE 2: Building has multiple floors (show floor picker buttons)
   else if (building.floors) {
     buttonContainer.style.display = "flex";
 
     building.floors.forEach((floor, index) => {
       const btn = document.createElement("button");
-
       btn.className = "floor-btn";
       btn.textContent = floor.name;
 
@@ -507,16 +234,16 @@ function openFloorPlan(buildingKey) {
       buttonContainer.appendChild(btn);
     });
 
+    // Automatically show the first floor when the popup opens
     if (building.floors.length > 0) {
       selectFloorLevel(0, buttonContainer.children[0]);
     }
   }
 
-  // CUSTOM CLICKABLE IMAGES
+  // CASE 3 (optional): Building has extra clickable images inside its popup
   if (building.customImages) {
     building.customImages.forEach((item) => {
       const img = document.createElement("img");
-
       img.src = item.img;
       img.alt = item.alt;
       img.className = "custom-modal-image";
@@ -529,10 +256,14 @@ function openFloorPlan(buildingKey) {
     });
   }
 
-  // Show modal
+  // Finally, actually show the popup
   modal.style.display = "flex";
 }
 
+
+// -----------------------------------------
+// 6. SWITCH BETWEEN FLOORS INSIDE A POPUP
+// -----------------------------------------
 function selectFloorLevel(floorIndex, selectedButton) {
   const building = buildingData[activeBuildingKey];
 
@@ -541,58 +272,50 @@ function selectFloorLevel(floorIndex, selectedButton) {
   }
 
   const floor = building.floors[floorIndex];
-
   if (!floor) {
     return;
   }
 
-  // Change floor image
+  // Swap the blueprint image to this floor's image
   document.getElementById("floor-blueprint").src = floor.img;
 
-  // Highlight selected floor
+  // Highlight the button for the floor that's currently selected
   const buttons = document.querySelectorAll(".floor-btn");
-
   buttons.forEach((button) => {
     button.classList.remove("active");
   });
-
   if (selectedButton) {
     selectedButton.classList.add("active");
   }
 
-  // Create room buttons for THIS floor
+  // Rebuild the room buttons list for this specific floor
   showFloorRooms(floor);
 }
 
+
+// -----------------------------------------
+// 7. SHOW ROOM DETAILS IN A SEPARATE POPUP
+// -----------------------------------------
 function showRoomInfo(room) {
   const roomInfo = document.getElementById("room-info");
   const modal = document.getElementById("roomInfoModal");
 
   roomInfo.innerHTML = `
     <h2>${room.name}</h2>
-
-    <p>
-      <strong>Section:</strong>
-      ${room.section}
-    </p>
-
-    <p>
-      <strong>Teacher:</strong>
-      ${room.teacher}
-    </p>
-
-    <p>
-      <strong>Subject:</strong>
-      ${room.subject}
-    </p>
+    <p><strong>Section:</strong> ${room.section}</p>
+    <p><strong>Teacher:</strong> ${room.teacher}</p>
+    <p><strong>Subject:</strong> ${room.subject}</p>
   `;
 
   modal.style.display = "flex";
 }
 
+
+// -----------------------------------------
+// 8. BUILD THE LIST OF ROOM BUTTONS FOR A FLOOR
+// -----------------------------------------
 function showFloorRooms(floor) {
   const roomButtons = document.querySelector(".room-buttons");
-
   roomButtons.innerHTML = "<h3>Room Information</h3>";
 
   if (!floor.rooms || floor.rooms.length === 0) {
@@ -602,7 +325,6 @@ function showFloorRooms(floor) {
 
   floor.rooms.forEach((room) => {
     const button = document.createElement("button");
-
     button.textContent = room.name;
 
     button.onclick = function () {
@@ -613,23 +335,24 @@ function showFloorRooms(floor) {
   });
 }
 
+
+// -----------------------------------------
+// 9. CLOSE POPUPS
+// -----------------------------------------
 function closeModal() {
   const modal = document.getElementById("floorModal");
-
   modal.style.display = "none";
 }
 
-// Close when clicking outside the modal box
+function closeRoomInfo() {
+  const modal = document.getElementById("roomInfoModal");
+  modal.style.display = "none";
+}
+
+// Close the building popup if someone clicks the dark overlay outside it
 window.addEventListener("click", function (event) {
   const modal = document.getElementById("floorModal");
-
   if (event.target === modal) {
     closeModal();
   }
 });
-
-function closeRoomInfo() {
-  const modal = document.getElementById("roomInfoModal");
-
-  modal.style.display = "none";
-}
