@@ -12,17 +12,36 @@ function adjustMapScale() {
 
   const isPhone = window.innerWidth <= 600;
 
-  // Mobile
+  // ==============================
+  // MOBILE
+  // ==============================
   if (isPhone) {
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    // Fit the 1200x1200 map inside the phone screen
+    const scaleWidth = containerWidth / 1200;
+    const scaleHeight = containerHeight / 1200;
+
+    const initialScale = Math.min(scaleWidth, scaleHeight);
+
+    mapScale = initialScale;
+    mapX = 0;
+    mapY = 0;
+    mapRotation = 0;
+
     mapArea.style.transformOrigin = "center center";
 
-    // Don't reset the mobile transform here.
-    // The touch controls handle it.
+    updateMapTransform();
+
     return;
   }
 
-  // Desktop / tablet
-  mapArea.style.transform = "none";
+  // ==============================
+  // DESKTOP / TABLET
+  // ==============================
+
+  mapArea.style.transformOrigin = "center center";
 
   const containerWidth = container.clientWidth - 20;
   const containerHeight = container.clientHeight - 20;
@@ -32,9 +51,10 @@ function adjustMapScale() {
 
   const scale = Math.min(scaleWidth, scaleHeight, 1);
 
-  mapArea.style.transform = `scale(${scale})`;
-  mapArea.style.transformOrigin = "center center";
+  mapArea.style.transform =
+    `scale(${scale})`;
 }
+
 
 // =========================================
 // MOBILE MAP CONTROLS
@@ -45,19 +65,33 @@ const mapArea = document.getElementById("map");
 
 let mapX = 0;
 let mapY = 0;
+
 let mapScale = 1;
 let mapRotation = 0;
 
+
+// Starting position for one finger
 let startX = 0;
 let startY = 0;
 
+let startMapX = 0;
+let startMapY = 0;
+
+
+// Starting values for two fingers
 let startDistance = 0;
 let startAngle = 0;
 
-let startMapX = 0;
-let startMapY = 0;
+let startCenterX = 0;
+let startCenterY = 0;
+
 let startScale = 1;
 let startRotation = 0;
+
+
+// =========================================
+// UPDATE MAP
+// =========================================
 
 function updateMapTransform() {
   mapArea.style.transform =
@@ -66,12 +100,22 @@ function updateMapTransform() {
     `rotate(${mapRotation}deg)`;
 }
 
+
+// =========================================
+// DISTANCE BETWEEN TWO FINGERS
+// =========================================
+
 function getDistance(touch1, touch2) {
   const dx = touch2.clientX - touch1.clientX;
   const dy = touch2.clientY - touch1.clientY;
 
   return Math.sqrt(dx * dx + dy * dy);
 }
+
+
+// =========================================
+// ANGLE BETWEEN TWO FINGERS
+// =========================================
 
 function getAngle(touch1, touch2) {
   const dx = touch2.clientX - touch1.clientX;
@@ -80,87 +124,174 @@ function getAngle(touch1, touch2) {
   return Math.atan2(dy, dx) * (180 / Math.PI);
 }
 
+
+// =========================================
+// TOUCH START
+// =========================================
+
 mapContainer.addEventListener(
-  "touchend",
+  "touchstart",
   function (e) {
+
     if (window.innerWidth > 600) return;
 
-    startMapX = mapX;
-    startMapY = mapY;
-    startScale = mapScale;
-    startRotation = mapRotation;
+    // ==========================
+    // ONE FINGER
+    // ==========================
+
+    if (e.touches.length === 1) {
+
+      const touch = e.touches[0];
+
+      startX = touch.clientX;
+      startY = touch.clientY;
+
+      startMapX = mapX;
+      startMapY = mapY;
+    }
+
+
+    // ==========================
+    // TWO FINGERS
+    // ==========================
+
+    if (e.touches.length === 2) {
+
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+
+      startDistance =
+        getDistance(touch1, touch2);
+
+      startAngle =
+        getAngle(touch1, touch2);
+
+
+      // Save the CENTER between fingers
+      startCenterX =
+        (touch1.clientX + touch2.clientX) / 2;
+
+      startCenterY =
+        (touch1.clientY + touch2.clientY) / 2;
+
+
+      startMapX = mapX;
+      startMapY = mapY;
+
+      startScale = mapScale;
+      startRotation = mapRotation;
+    }
+
   },
   { passive: false }
 );
 
-    if (e.touches.length === 2) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
 
-      startDistance = getDistance(touch1, touch2);
-      startAngle = getAngle(touch1, touch2);
-
-      startMapX = mapX;
-      startMapY = mapY;
-      startScale = mapScale;
-      startRotation = mapRotation;
-    }
-  { passive: false }
-
+// =========================================
+// TOUCH MOVE
+// =========================================
 
 mapContainer.addEventListener(
   "touchmove",
   function (e) {
+
     if (window.innerWidth > 600) return;
 
     e.preventDefault();
 
-    // ONE FINGER = MOVE
+
+    // ==========================
+    // ONE FINGER = PAN
+    // ==========================
+
     if (e.touches.length === 1) {
+
       const touch = e.touches[0];
 
-      const dx = touch.clientX - startX;
-      const dy = touch.clientY - startY;
+      const dx =
+        touch.clientX - startX;
 
-      mapX = startMapX + dx;
-      mapY = startMapY + dy;
+      const dy =
+        touch.clientY - startY;
+
+
+      mapX =
+        startMapX + dx;
+
+      mapY =
+        startMapY + dy;
+
 
       updateMapTransform();
     }
 
-    // TWO FINGERS = ZOOM + ROTATE + MOVE
+
+    // ==========================
+    // TWO FINGERS
+    // ==========================
+
     if (e.touches.length === 2) {
+
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
 
-      const currentDistance = getDistance(touch1, touch2);
-      const currentAngle = getAngle(touch1, touch2);
 
-      // Zoom
-      const scaleChange = currentDistance / startDistance;
+      // --------------------------
+      // CURRENT DISTANCE
+      // --------------------------
 
-      mapScale = startScale * scaleChange;
+      const currentDistance =
+        getDistance(touch1, touch2);
+
+
+      // --------------------------
+      // CURRENT ANGLE
+      // --------------------------
+
+      const currentAngle =
+        getAngle(touch1, touch2);
+
+
+      // --------------------------
+      // ZOOM
+      // --------------------------
+
+      if (startDistance > 0) {
+
+        const scaleChange =
+          currentDistance / startDistance;
+
+        mapScale =
+          startScale * scaleChange;
+      }
+
 
       // Limit zoom
-      mapScale = Math.max(0.5, Math.min(mapScale, 3));
+      mapScale =
+        Math.max(0.5, Math.min(mapScale, 3));
 
-      // Rotation
-      const angleChange = currentAngle - startAngle;
 
-      mapRotation = startRotation + angleChange;
+      // --------------------------
+      // ROTATION
+      // --------------------------
 
-      // Move using the midpoint of the two fingers
-      const startCenterX =
-        (startX + touch2.clientX) / 2;
+      const angleChange =
+        currentAngle - startAngle;
 
-      const startCenterY =
-        (startY + touch2.clientY) / 2;
+      mapRotation =
+        startRotation + angleChange;
+
+
+      // --------------------------
+      // MOVE USING FINGER CENTER
+      // --------------------------
 
       const currentCenterX =
         (touch1.clientX + touch2.clientX) / 2;
 
       const currentCenterY =
         (touch1.clientY + touch2.clientY) / 2;
+
 
       mapX =
         startMapX +
@@ -170,47 +301,70 @@ mapContainer.addEventListener(
         startMapY +
         (currentCenterY - startCenterY);
 
+
       updateMapTransform();
     }
+
   },
   { passive: false }
 );
+
+
+// =========================================
+// TOUCH END
+// =========================================
 
 mapContainer.addEventListener(
   "touchend",
   function () {
+
     if (window.innerWidth > 600) return;
 
-    // Reset starting values after gesture
-    if (event.touches.length === 0) {
-      startMapX = mapX;
-      startMapY = mapY;
-      startScale = mapScale;
-      startRotation = mapRotation;
-    }
+    startMapX = mapX;
+    startMapY = mapY;
+
+    startScale = mapScale;
+    startRotation = mapRotation;
+
   },
   { passive: false }
 );
 
-window.addEventListener("load", adjustMapScale);
 
-window.addEventListener("resize", () => {
-  setTimeout(adjustMapScale, 200);
-});
+// =========================================
+// INITIALIZE MAP
+// =========================================
 
-window.addEventListener("orientationchange", () => {
-  setTimeout(adjustMapScale, 500);
-});
+window.addEventListener(
+  "load",
+  adjustMapScale
+);
 
-window.addEventListener("load", adjustMapScale);
 
-window.addEventListener("resize", () => {
-  setTimeout(adjustMapScale, 200);
-});
+window.addEventListener(
+  "resize",
+  function () {
 
-window.addEventListener("orientationchange", () => {
-  setTimeout(adjustMapScale, 500);
-});
+    setTimeout(
+      adjustMapScale,
+      200
+    );
+
+  }
+);
+
+
+window.addEventListener(
+  "orientationchange",
+  function () {
+
+    setTimeout(
+      adjustMapScale,
+      500
+    );
+
+  }
+);
 const buildingData = {
   newBuilding: {
     name: "New Building",
