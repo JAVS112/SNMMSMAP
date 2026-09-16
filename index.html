@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SNMMS Digital School Map</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <script src="script.js"></script>
+  <body>
+    <div class="image-row">
+      <img src="FINAL/SNMMS LOGO.png" alt="School Logo" class="img" />
+      <div class="text-container">
+        <div class="text-between">Sto. Niño Mactan Montessori School Inc.</div>
+        <div class="text1">Lapu-Lapu City, Cebu</div>
+      </div>
+    </div>
+    <!-- Map container window context -->
+    <div id="map-container">
+      <div class="map-area" id="map">
+        <img
+          src="NewMap/2.png"
+          class="Border"
+          alt="Scale Border"
+          draggable="false"
+        />
+
+        <img
+          src="NewMap/3.png"
+          class="NewB"
+          alt="New Building"
+          onclick="openFloorPlan('newBuilding')"
+          draggable="false"
+        />
+        <img src="NewMap/3.png" class="RB1" alt="Room1" draggable="false" />
+
+        <img
+          src="NewMap/3.png"
+          class="A1"
+          alt="Building 1"
+          onclick="openFloorPlan('A1')"
+          draggable="false"
+        />
+        <img
+          src="NewMap/3.png"
+          class="B2"
+          alt="Building 2"
+          onclick="openFloorPlan('B2')"
+          draggable="false"
+        />
+
+        <img src="NewMap/3.png" class="RB2" alt="Room2" draggable="false" />
+        <img src="NewMap/3.png" class="RB3" alt="Room3" draggable="false" />
+        <img src="NewMap/3.png" class="RB4" alt="Room4" draggable="false" />
+        <img src="NewMap/3.png" class="RB5" alt="Room5" draggable="false" />
+        <img src="NewMap/5.png" class="RB6" alt="Room6" draggable="false" />
+        <img src="NewMap/5.png" class="Pool" alt="Pool" draggable="false" />
+        <img src="NewMap/5.png" class="Room4" alt="Room4" draggable="false" />
+
+        <img
+          src="NewMap/3.png"
+          class="Campus"
+          alt="Campus"
+          onclick="openFloorPlan('C1')"
+          draggable="false"
+        />
+        <img
+          src="NewMap/4.png"
+          class="College"
+          alt="College"
+          onclick="openFloorPlan('C2')"
+          draggable="false"
+        />
+        <img
+          src="NewMap/5.png"
+          class="Library"
+          alt="Library"
+          onclick="openFloorPlan('L1')"
+          draggable="false"
+        />
+
+        <img
+          src="NewMap/4.png"
+          class="Room1"
+          alt="College"
+          onclick="openFloorPlan('R1')"
+          draggable="false"
+        />
+        <img
+          src="NewMap/4.png"
+          class="Room2"
+          alt="College"
+          onclick="openFloorPlan('R2')"
+          draggable="false"
+        />
+        <img
+          src="NewMap/6.png"
+          class="Room3"
+          alt="College"
+          onclick="openFloorPlan('R3')"
+          draggable="false"
+        />
+
+        <img
+          src="NewMap/5.png"
+          class="AdminB"
+          alt="admin"
+          onclick="openFloorPlan('A')"
+          draggable="false"
+        />
+      </div>
+    </div>
+
+    <div id="floorModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modal-building-name">Building Details</h2>
+
+        <div id="floor-buttons-container" class="floor-buttons-nav"></div>
+
+        <div class="floor-map-container" id="floor-map">
+          <img id="floor-blueprint" src="" alt="Floor Map Blueprint View" />
+          <div class="room-buttons">
+            <h3>Room Information</h3>
+
+            <button onclick="showRoomInfo('room101')">Room 101</button>
+
+            <button onclick="showRoomInfo('room102')">Room 102</button>
+
+            <button onclick="showRoomInfo('room103')">Room 103</button>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="roomInfoModal" class="modal">
+
+  <div class="modal-content">
+
+    <span
+      class="close-btn"
+      onclick="closeRoomInfo()"
+    >
+      &times;
+    </span>
+
+    <div id="room-info">
+    </div>
+
+  </div>
+
+</div>
+  </body>
+</html>

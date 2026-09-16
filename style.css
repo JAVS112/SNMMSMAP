@@ -1,0 +1,422 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f9;
+  box-sizing: border-box;
+}
+.Border {
+  position: absolute;
+  top: 0;
+  left: px;
+  width: 1500px;
+  height: 100%;
+  pointer-events: none;
+  transform: rotate(-90deg);
+}
+/* Logo and title header styling */
+.image-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.text-between {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: #1a365d;
+}
+.text1 {
+  font-size: 18px;
+  text-align: center;
+  color: #4a5568;
+}
+.img {
+  width: 100px;
+  height: 100px;
+}
+/* Map container (sudlanan) */
+#map-container {
+  width: 100%;
+  max-width: 1220px;
+  height: 750px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.map-scale-wrapper {
+  width: 1200px;
+  height: 1200px;
+}
+/* Map area (mga buildings)*/
+
+.map-area {
+  position: relative;
+  width: 1200px;
+  height: 1200px;
+}
+
+.NewB {
+  position: absolute;
+  top: 183px;
+  left: 258px;
+  width: 236px;
+  height: 101px;
+  cursor: pointer;
+  transform: rotate(-90deg);
+}
+
+.AdminB {
+  position: absolute;
+  top: 645px;
+  left: 594px;
+  width: 405px;
+  height: 114px;
+  cursor: pointer;
+}
+
+.RB1 {
+  position: absolute;
+  top: 360px;
+  left: 300px;
+  width: 58px;
+  height: 57px;
+  transform: rotate(40deg);
+}
+.RB3 {
+  position: absolute;
+  top: 315px;
+  left: 555px;
+  width: 99px;
+  height: 100px;
+}
+.RB4 {
+  position: absolute;
+  top: 315px;
+  left: 665px;
+  width: 99px;
+  height: 100px;
+}
+
+.RB5 {
+  position: absolute;
+  top: 315px;
+  left: 782px;
+  width: 240px;
+  height: 204px;
+}
+
+.RB6 {
+  position: absolute;
+  top: 555px;
+  left: 1123px;
+  width: 143px;
+  height: 106px;
+}
+
+.Room4 {
+  position: absolute;
+  top: 754px;
+  left: 1151px;
+  width: 106px;
+  height: 96px;
+}
+
+.Pool {
+  position: absolute;
+  top: 669px;
+  left: 1202px;
+  width: 54px;
+  height: 71px;
+}
+
+.A1 {
+  position: absolute;
+  top: 432px;
+  left: 283px;
+  width: 100px;
+  height: 287px;
+  cursor: pointer;
+  transform: rotate(-17deg);
+}
+.B2 {
+  position: absolute;
+  top: 813px;
+  left: 362px;
+  width: 95px;
+  height: 190px;
+  cursor: pointer;
+}
+.RB2 {
+  position: absolute;
+  top: 767px;
+  left: 400px;
+  width: 57px;
+  height: 44px;
+}
+
+.Campus {
+  position: absolute;
+  top: 766px;
+  left: 465px;
+  width: 535px;
+  height: 359px;
+  cursor: pointer;
+}
+.College {
+  position: absolute;
+  top: 645px;
+  left: 1000px;
+  width: 109px;
+  height: 396px;
+  cursor: pointer;
+}
+
+.Library {
+  position: absolute;
+  top: 1029px;
+  left: 1012px;
+  width: 84px;
+  height: 110px;
+  cursor: pointer;
+  transform: rotate(90deg);
+}
+
+.Room1 {
+  position: absolute;
+  top: 1041px;
+  left: 1109px;
+  width: 125px;
+  height: 86px;
+  cursor: pointer;
+}
+
+.Room2 {
+  position: absolute;
+  top: 916px;
+  left: 1123px;
+  width: 111px;
+  height: 125px;
+  cursor: pointer;
+}
+
+.Room3 {
+  position: absolute;
+  top: 850px;
+  left: 1123px;
+  width: 111px;
+  height: 69px;
+  cursor: pointer;
+}
+
+/* Modal Overlay Control Layout */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 85%;
+  max-width: 750px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease-out;
+}
+.custom-modal-image {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #a0aec0;
+  transition: color 0.2s;
+}
+.close-btn:hover {
+  color: #2d3748;
+}
+#modal-building-name {
+  margin-top: 0;
+  color: #1a365d;
+  font-size: 24px;
+}
+
+/* Floor Navigation Menu Inside Modal */
+.floor-buttons-nav {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.floor-btn {
+  background-color: #edf2f7;
+  color: #2d3748;
+  border: 2px solid #cbd5e0;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.floor-btn:hover {
+  background-color: #cbd5e0;
+}
+.floor-btn.active {
+  background-color: #3182ce;
+  color: white;
+  border-color: #2b6cb0;
+}
+
+/* Blueprint Rendering Area */
+.floor-map-container {
+  margin-top: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px;
+  background-color: #f7fafc;
+  overflow: auto;
+}
+#floor-blueprint {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* TEMPORARY:
+   Shows the clickable area when you hover.
+   Remove this later when everything is positioned. */
+
+.room-area:hover {
+  background: rgba(49, 130, 206, 0.25);
+}
+
+/* =========================================
+   ROOM POSITIONS
+========================================= */
+
+/* Room 101 */
+.room-101 {
+  left: 10%;
+  top: 10%;
+  width: 25%;
+  height: 25%;
+}
+.room-102 {
+  left: 40%;
+  top: 10%;
+  width: 25%;
+  height: 25%;
+}
+.room-103 {
+  left: 10%;
+  top: 45%;
+  width: 25%;
+  height: 25%;
+}
+/* =========================================
+   ROOM INFORMATION
+========================================= */
+
+#room-info {
+  margin-top: 15px;
+  padding: 15px;
+
+  background-color: #f7fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+
+  text-align: left;
+}
+#room-info h2 {
+  margin-top: 0;
+  color: #1a365d;
+}
+#room-info h3 {
+  color: #2d3748;
+}
+#room-info li {
+  margin-bottom: 5px;
+}
+#map img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* auto-adjust map scaling for different screen sizes */
+@media screen and (max-width: 600px) {
+  body {
+    padding-top: 15px;
+  }
+  .image-row {
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  .text-between {
+    font-size: 16px;
+  }
+  .text1 {
+    font-size: 12px;
+  }
+  .img {
+    width: 50px;
+    height: 50px;
+  }
+  #map-container {
+    width: 95vw;
+    height:70vh;
+    overflow: hidden;
+    display: block;
+    padding: 0;
+    position: relative;
+    touch-action: none;
+  }
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+  .floor-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    flex: 1 1 40%;
+  }
+}
