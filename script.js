@@ -1,32 +1,11 @@
-// =========================================
-// SNMMS DIGITAL SCHOOL MAP - script.js
-// =========================================
-// IMPORTANT: In your index.html, make sure the <script> tag has "defer" on it,
-// and it can stay in <head> or before <body> - defer makes it wait until
-// the HTML page has finished loading before running this file. Example:
-//
-//   <script src="script.js" defer></script>
-//
-// Without "defer", this file tries to grab #map-container and #map before
-// they exist yet, and everything below silently fails.
 
-
-// -----------------------------------------
 // 1. GRAB THE MAP ELEMENTS FROM THE PAGE
-// -----------------------------------------
+
 const mapContainer = document.getElementById("map-container");
 const mapArea = document.getElementById("map");
-
-// This is the "real" size of your map artwork (the .map-area box in your CSS
-// is 1200px by 1200px). We use these numbers to figure out how much to shrink
-// the map so it fits inside the visible window, no matter the screen size.
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 1200;
-
-
-// -----------------------------------------
 // 2. STOP IMAGES FROM BEING DRAGGED
-// -----------------------------------------
 // This just prevents the "ghost image" drag effect when someone clicks
 // and drags on a map image.
 document.querySelectorAll("#map img").forEach((img) => {
@@ -34,15 +13,8 @@ document.querySelectorAll("#map img").forEach((img) => {
     e.preventDefault();
   });
 });
-
-
-// -----------------------------------------
 // 3. SCALE THE MAP TO FIT ITS CONTAINER
-// -----------------------------------------
 // This is the function that fixes the "zoomed in" problem.
-// It measures how big the container is right now (which changes based on
-// your CSS media query for phones vs desktop), then shrinks the map down
-// so the WHOLE 1200x1200 map fits inside, instead of getting cropped.
 function adjustMapScale() {
   if (!mapContainer || !mapArea) return;
 
@@ -80,15 +52,7 @@ window.addEventListener("load", adjustMapScale);
 
 // ...and run it again every time the window is resized (rotating a phone,
 // resizing a browser window, etc.) so the map keeps fitting correctly.
-window.addEventListener("resize", adjustMapScale);
-
-
-// -----------------------------------------
 // 4. BUILDING / FLOOR / ROOM DATA
-// -----------------------------------------
-// This is just a big object holding info about every clickable building.
-// Buildings with "floors" show a floor picker inside the popup.
-// Buildings with just "img" show a single image with no floor picker.
 const buildingData = {
   newBuilding: {
     name: "New Building",
