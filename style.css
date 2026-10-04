@@ -107,25 +107,25 @@ body {
 }
 .RB3 {
   position: absolute;
-  top: 315px;
+  top: 320px;
   left: 555px;
   width: 99px;
   height: 100px;
 }
 .RB4 {
   position: absolute;
-  top: 315px;
+  top: 320px;
   left: 665px;
   width: 99px;
   height: 100px;
 }
 
 .RB5 {
-  position: absolute;
-  top: 315px;
-  left: 782px;
+ position: absolute;
+  top: 320px;
+  left: 790px;
   width: 240px;
-  height: 204px;
+  height: 197px;
 }
 
 .RB6 {
@@ -427,3 +427,31 @@ body {
     font-size: 13px;
     flex: 1 1 40%;
   }
+/* =========================================
+   MAP HOVER LABEL
+========================================= */
+
+.map-tooltip {
+  position: fixed;
+  z-index: 3000;
+
+  background-color: #1a365d;
+  color: white;
+
+  padding: 8px 12px;
+  border-radius: 6px;
+
+  font-size: 14px;
+  font-weight: bold;
+
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 0.15s ease;
+
+  white-space: nowrap;
+}
+
+.map-tooltip.show {
+  opacity: 1;
+}

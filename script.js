@@ -320,3 +320,27 @@ window.addEventListener("click", function (event) {
     closeModal();
   }
 });
+
+const mapImages = document.querySelectorAll("#map img[data-name]");
+
+const tooltip = document.createElement("div");
+tooltip.className = "map-tooltip";
+document.body.appendChild(tooltip);
+
+mapImages.forEach((image) => {
+
+  image.addEventListener("mouseenter", () => {
+    tooltip.textContent = image.dataset.name;
+    tooltip.classList.add("show");
+  });
+
+  image.addEventListener("mousemove", (event) => {
+    tooltip.style.left = event.clientX + 15 + "px";
+    tooltip.style.top = event.clientY + 15 + "px";
+  });
+
+  image.addEventListener("mouseleave", () => {
+    tooltip.classList.remove("show");
+  });
+
+});
